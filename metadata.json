@@ -1,0 +1,6 @@
+{
+  "name": "MediReach AI",
+  "description": "India-focused healthcare access, navigation, multilingual AI health guidance, hospital finder, and personal health workspace.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

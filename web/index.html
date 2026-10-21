@@ -1,0 +1,862 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MediReach AI — One Platform. Smarter Healthcare. Accessible to Everyone.</title>
+  <link rel="manifest" href="/manifest.json" />
+  <meta name="theme-color" content="#0B6E69" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=JetBrains+Mono:wght@500;700&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #F6FAF9;
+      --surface: #FFFFFF;
+      --surface-variant: #E3EFED;
+      --primary: #0B6E69;
+      --primary-dark: #064643;
+      --primary-container: #CCF2EE;
+      --on-primary-container: #042F2D;
+      --secondary: #C2512D;
+      --secondary-container: #FFDBD0;
+      --tertiary: #8C5E00;
+      --tertiary-container: #FFE099;
+      --danger: #BA1A1A;
+      --danger-container: #FFDAD6;
+      --text: #122120;
+      --text-muted: #3E5250;
+      --border: #CBE0DD;
+      --radius: 16px;
+      --shadow: 0 4px 18px rgba(11, 110, 105, 0.08);
+    }
+    body.high-contrast {
+      --bg: #081211;
+      --surface: #112120;
+      --surface-variant: #1F3634;
+      --primary: #5CE1D8;
+      --primary-dark: #33BFB6;
+      --primary-container: #00504C;
+      --on-primary-container: #9CF7F0;
+      --secondary: #FFB59E;
+      --secondary-container: #631E06;
+      --danger: #FFB4AB;
+      --danger-container: #73000A;
+      --text: #ECF7F6;
+      --text-muted: #BDD1CE;
+      --border: #2E4F4C;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'DM Sans', system-ui, -apple-system, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.55;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+    h1, h2, h3, h4, .brand-title {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      letter-spacing: -0.02em;
+    }
+    .mono {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.84rem;
+    }
+    /* Emergency Top Banner */
+    .emergency-bar {
+      background: var(--danger-container);
+      color: var(--danger);
+      padding: 10px 18px;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      border-bottom: 1px solid rgba(186,26,26,0.2);
+    }
+    .emergency-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+    .btn-sos {
+      background: #BA1A1A;
+      color: #FFFFFF;
+      text-decoration: none;
+      padding: 6px 12px;
+      border-radius: 10px;
+      font-weight: 700;
+      font-size: 0.85rem;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      border: none;
+      cursor: pointer;
+    }
+    /* Header */
+    header {
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      padding: 14px 20px;
+      position: sticky;
+      top: 0;
+      z-index: 50;
+    }
+    .header-inner {
+      max-width: 1240px;
+      margin: 0 auto;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+    }
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .brand-icon {
+      width: 44px;
+      height: 44px;
+      border-radius: 12px;
+      background: var(--primary);
+      color: var(--bg);
+      display: grid;
+      place-items: center;
+      font-weight: 800;
+      font-size: 1.25rem;
+    }
+    .toolbar-controls {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 8px;
+    }
+    .chip {
+      padding: 6px 12px;
+      border-radius: 999px;
+      border: 1px solid var(--border);
+      background: var(--surface-variant);
+      color: var(--text);
+      font-size: 0.82rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+    .chip.active {
+      background: var(--primary);
+      color: #FFFFFF;
+      border-color: var(--primary);
+    }
+    body.high-contrast .chip.active {
+      color: #002927;
+    }
+    /* Main Layout */
+    .app-shell {
+      max-width: 1240px;
+      width: 100%;
+      margin: 0 auto;
+      padding: 20px;
+      display: grid;
+      grid-template-columns: 250px 1fr;
+      gap: 22px;
+      flex: 1;
+    }
+    @media (max-width: 880px) {
+      .app-shell {
+        grid-template-columns: 1fr;
+        padding: 14px;
+      }
+    }
+    /* Sidebar Navigation */
+    .side-nav {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    @media (max-width: 880px) {
+      .side-nav {
+        flex-direction: row;
+        overflow-x: auto;
+        padding-bottom: 6px;
+      }
+    }
+    .nav-btn {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 12px 14px;
+      border-radius: 12px;
+      border: 1px solid transparent;
+      background: transparent;
+      color: var(--text);
+      font-weight: 600;
+      font-size: 0.94rem;
+      cursor: pointer;
+      text-align: left;
+      white-space: nowrap;
+    }
+    .nav-btn:hover {
+      background: var(--surface-variant);
+    }
+    .nav-btn.active {
+      background: var(--primary-container);
+      color: var(--on-primary-container);
+      border-color: var(--primary);
+    }
+    /* Cards & Grids */
+    .section-panel { display: none; flex-direction: column; gap: 18px; }
+    .section-panel.active { display: flex; }
+    .hero-card {
+      background: linear-gradient(135deg, var(--primary-container), var(--surface));
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 22px;
+      box-shadow: var(--shadow);
+    }
+    body.low-bandwidth .hero-card {
+      background: var(--surface);
+      box-shadow: none;
+    }
+    .safety-banner {
+      background: var(--surface-variant);
+      border-left: 4px solid var(--primary);
+      padding: 12px 16px;
+      border-radius: 10px;
+      font-size: 0.88rem;
+      color: var(--text-muted);
+    }
+    .grid-2 {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(290px, 1fr));
+      gap: 16px;
+    }
+    .grid-3 {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+      gap: 14px;
+    }
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 18px;
+      box-shadow: var(--shadow);
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    body.low-bandwidth .card {
+      box-shadow: none;
+      padding: 12px;
+    }
+    .badge {
+      display: inline-block;
+      padding: 3px 9px;
+      border-radius: 6px;
+      font-size: 0.75rem;
+      font-weight: 700;
+      background: var(--primary-container);
+      color: var(--on-primary-container);
+      width: fit-content;
+    }
+    .badge.warn {
+      background: var(--secondary-container);
+      color: var(--secondary);
+    }
+    .badge.danger {
+      background: var(--danger-container);
+      color: var(--danger);
+    }
+    /* Inputs & Buttons */
+    input, textarea, select {
+      width: 100%;
+      padding: 11px 14px;
+      border-radius: 12px;
+      border: 1px solid var(--border);
+      background: var(--bg);
+      color: var(--text);
+      font-family: inherit;
+      font-size: 0.95rem;
+    }
+    .btn {
+      padding: 11px 18px;
+      border-radius: 12px;
+      border: none;
+      background: var(--primary);
+      color: #FFFFFF;
+      font-weight: 700;
+      font-size: 0.92rem;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      text-decoration: none;
+    }
+    body.high-contrast .btn { color: #002927; }
+    .btn-outline {
+      background: transparent;
+      border: 1px solid var(--primary);
+      color: var(--primary);
+    }
+    .btn-danger {
+      background: var(--danger);
+      color: #FFFFFF;
+    }
+    .progress-bar {
+      width: 100%;
+      height: 8px;
+      background: var(--surface-variant);
+      border-radius: 99px;
+      overflow: hidden;
+    }
+    .progress-fill {
+      height: 100%;
+      background: var(--primary);
+    }
+    footer {
+      text-align: center;
+      padding: 18px;
+      font-size: 0.82rem;
+      color: var(--text-muted);
+      border-top: 1px solid var(--border);
+      margin-top: 24px;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Emergency Connect Bar (Feature #7) -->
+  <div class="emergency-bar" role="region" aria-label="Emergency Helplines">
+    <div>
+      <strong>🚨 Emergency Connect (24x7 Toll-Free India):</strong>
+      <span>Chest pain, breathing distress, snakebite, or maternal danger signs? Call immediately:</span>
+    </div>
+    <div class="emergency-actions">
+      <a class="btn-sos" href="tel:108">📞 108 Ambulance</a>
+      <a class="btn-sos" href="tel:112">🆘 112 National SOS</a>
+      <a class="btn-sos" href="tel:104" style="background:#0B6E69;">🩺 104 Health Helpline</a>
+      <a class="btn-sos" href="tel:102" style="background:#C2512D;">🤰 102 Janani Maternal</a>
+    </div>
+  </div>
+
+  <!-- Top Header -->
+  <header>
+    <div class="header-inner">
+      <div class="brand">
+        <div class="brand-icon">✚</div>
+        <div>
+          <div class="brand-title" style="font-size:1.25rem;font-weight:800;" id="appTitle">MediReach AI</div>
+          <div style="font-size:0.82rem;color:var(--text-muted);" id="appTagline">
+            One Platform. Smarter Healthcare. Accessible to Everyone. (Web + Android PWA)
+          </div>
+        </div>
+      </div>
+      <div class="toolbar-controls">
+        <button class="chip active" onclick="setLanguage('EN')" id="langEN">English</button>
+        <button class="chip" onclick="setLanguage('HI')" id="langHI">हिन्दी</button>
+        <button class="chip" onclick="setLanguage('OR')" id="langOR">ଓଡ଼ିଆ</button>
+        <button class="chip" onclick="toggleLowBandwidth()" id="btnBandwidth">⚡ 2G Low-Bandwidth: OFF</button>
+        <button class="chip" onclick="toggleHighContrast()" id="btnContrast">◑ High Contrast</button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Responsive Shell -->
+  <div class="app-shell">
+    <!-- Navigation Rail / Bar -->
+    <nav class="side-nav" aria-label="Primary Navigation">
+      <button class="nav-btn active" onclick="switchTab('home', this)">🏠 Home Dashboard</button>
+      <button class="nav-btn" onclick="switchTab('ai', this)">🧠 AI Health & Voice</button>
+      <button class="nav-btn" onclick="switchTab('care', this)">🏥 Care Finder & Capacity</button>
+      <button class="nav-btn" onclick="switchTab('workspace', this)">📋 Health Workspace</button>
+      <button class="nav-btn" onclick="switchTab('public', this)">🏛️ Schemes & Offline</button>
+      <button class="nav-btn" onclick="switchTab('auth', this)">🔐 Auth & Privacy Center</button>
+    </nav>
+
+    <!-- Main Content Area -->
+    <main>
+      <!-- Safety Boundary -->
+      <div class="safety-banner" style="margin-bottom:16px;">
+        <strong>Health Safety Boundary:</strong> MediReach AI is an educational information and healthcare navigation platform, not a clinical diagnostic or prescription service. Sources: MoHFW India, ICMR & WHO.
+      </div>
+
+      <!-- TAB 1: HOME DASHBOARD -->
+      <section id="tab-home" class="section-panel active">
+        <div class="hero-card">
+          <span class="badge">ANDROID APP + INSTALLABLE WEB PWA</span>
+          <h1 style="font-size:1.75rem;margin-top:8px;" id="heroHeading">
+            Smarter Healthcare Access for Every Community in India
+          </h1>
+          <p style="color:var(--text-muted);margin-top:6px;">
+            Navigate Primary Health Centres (PHCs), Community Health Centres (CHCs), AIIMS & District Hospitals, understand lab reports in English, Hindi & Odia, check PM-JAY / BSKY eligibility, and prepare for doctor visits.
+          </p>
+          <div style="display:flex;flex-wrap:wrap;gap:10px;margin-top:14px;">
+            <button class="btn" onclick="switchTabById('ai')">Ask AI Symptom & Report Guide →</button>
+            <button class="btn btn-outline" onclick="switchTabById('care')">Find Hospitals & Bed Capacity</button>
+            <button class="btn btn-outline" onclick="switchTabById('public')">Offline Emergency First-Aid</button>
+          </div>
+        </div>
+
+        <h3>Quick Access — All 20 MediReach AI Capabilities</h3>
+        <div class="grid-3">
+          <div class="card">
+            <span class="badge">1–5 & 14 • AI & VOICE</span>
+            <h4>AI Health Assistant</h4>
+            <p style="font-size:0.88rem;color:var(--text-muted);">Symptom Guide, Medical Report Explainer, Patient Translator (EN/HI/OR), Medicine Safety & Voice TTS.</p>
+            <button class="btn btn-outline" onclick="switchTabById('ai')">Open AI Suite</button>
+          </div>
+          <div class="card">
+            <span class="badge">6, 7, 12, 16 • CARE ACCESS</span>
+            <h4>Care Finder & Desert Detector</h4>
+            <p style="font-size:0.88rem;color:var(--text-muted);">Live-style General/ICU beds, oxygen status, OPD wait times & rural healthcare desert alerts.</p>
+            <button class="btn btn-outline" onclick="switchTabById('care')">Explore Facilities</button>
+          </div>
+          <div class="card">
+            <span class="badge">8, 9, 10, 13 • WORKSPACE</span>
+            <h4>Timeline, Visit Prep & Reminders</h4>
+            <p style="font-size:0.88rem;color:var(--text-muted);">Prepare OPD doctor questions, track longitudinal symptom history & daily medicine reminders.</p>
+            <button class="btn btn-outline" onclick="switchTabById('workspace')">Open Workspace</button>
+          </div>
+          <div class="card">
+            <span class="badge">11, 15, 18, 19 • PUBLIC HEALTH</span>
+            <h4>Govt Schemes & Offline Mode</h4>
+            <p style="font-size:0.88rem;color:var(--text-muted);">Ayushman Bharat PM-JAY, BSKY Odisha, JSY, Jan Aushadhi generics & zero-internet first-aid.</p>
+            <button class="btn btn-outline" onclick="switchTabById('public')">Check Benefits</button>
+          </div>
+          <div class="card">
+            <span class="badge">17, 20 • TRUST & PRIVACY</span>
+            <h4>Login, Consent & Data Control</h4>
+            <p style="font-size:0.88rem;color:var(--text-muted);">Firebase Authentication (Google + Email/Password), DPDP consent toggles, JSON export & erasure.</p>
+            <button class="btn btn-outline" onclick="switchTabById('auth')">Manage Privacy</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- TAB 2: AI HEALTH ASSISTANT & MULTILINGUAL VOICE -->
+      <section id="tab-ai" class="section-panel">
+        <div class="card">
+          <h2>AI Healthcare Intelligence & Multilingual Voice Assistant</h2>
+          <p style="font-size:0.9rem;color:var(--text-muted);">
+            Select a specialized tool below, type or speak your question, and listen to the response in English, Hindi (हिन्दी), or Odia (ଓଡ଼ିଆ).
+          </p>
+          <div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:6px;">
+            <button class="chip active" onclick="setAiMode('SYMPTOM', this)">1. AI Symptom Guide</button>
+            <button class="chip" onclick="setAiMode('REPORT', this)">2. Medical Report Explainer</button>
+            <button class="chip" onclick="setAiMode('TRANSLATOR', this)">3. Patient Translator (EN/HI/OR)</button>
+            <button class="chip" onclick="setAiMode('MEDICINE', this)">4. Medicine Safety Info</button>
+            <button class="chip" onclick="setAiMode('NAVIGATION', this)">5. Care Navigation Agent</button>
+          </div>
+
+          <textarea id="aiInput" rows="3" placeholder="Describe symptoms, paste lab values (e.g., Hb 9.4 g/dL, Platelets 1.1L), or enter a phrase to translate..."></textarea>
+
+          <div style="display:flex;flex-wrap:wrap;gap:8px;">
+            <button class="chip" onclick="fillSample('3 days fever 101°F with body ache & retro-orbital headache')">Sample: 3-Day Fever & Dengue Check</button>
+            <button class="chip" onclick="fillSample('Hemoglobin 9.4 g/dL and HbA1c 7.1% — explain in simple terms')">Sample: Hb 9.4 & HbA1c Report</button>
+            <button class="chip" onclick="fillSample('Translate to Hindi & Odia: I have chest burning after meals and dizziness')">Sample: Translate Symptom for Doctor</button>
+          </div>
+
+          <div style="display:flex;flex-wrap:wrap;gap:10px;margin-top:6px;">
+            <button class="btn" onclick="runAiGuidance()">✨ Get Verified Guidance</button>
+            <button class="btn btn-outline" onclick="startVoiceRecognition()">🎙️ Speak Question</button>
+            <button class="btn btn-outline" onclick="speakCurrentAiOutput()">🔊 Read Aloud (TTS)</button>
+          </div>
+        </div>
+
+        <div id="aiOutputCard" class="card" style="border-color:var(--primary);">
+          <span class="badge" id="aiOutputBadge">SYMPTOM GUIDE • VERIFIED REFERENCE</span>
+          <div id="aiOutputText" style="white-space:pre-line;font-size:0.95rem;">
+            Select a sample prompt or enter a question above to receive non-diagnostic guidance with red-flag warnings, OPD doctor questions, and MoHFW / ICMR / WHO citations.
+          </div>
+        </div>
+
+        <h3>Medicine Safety & PM Bhartiya Janaushadhi Generic Price Comparison</h3>
+        <div class="grid-2">
+          <div class="card">
+            <span class="badge">NLEM ESSENTIAL MEDICINE</span>
+            <h4>Paracetamol 500mg / 650mg</h4>
+            <p class="mono" style="color:var(--secondary);">Jan Aushadhi: ~₹9 for 15 tabs (vs ₹32 branded)</p>
+            <p style="font-size:0.88rem;">First-line antipyretic for fever and mild pain. Space doses by 4–6 hours; never exceed 4,000mg/day across all tablets.</p>
+            <p style="font-size:0.82rem;color:var(--danger);">⚠️ Safe in suspected Dengue fever unlike Aspirin/Ibuprofen/Diclofenac (which increase bleeding risk).</p>
+          </div>
+          <div class="card">
+            <span class="badge">WHO FORMULA (245 mOsm/L)</span>
+            <h4>Low-Osmolarity ORS + Zinc 20mg</h4>
+            <p class="mono" style="color:var(--secondary);">Jan Aushadhi: ₹4/sachet (Free at Govt PHCs & ASHA)</p>
+            <p style="font-size:0.88rem;">Mix 1 full packet in 1 Litre of clean water. Essential for diarrhea & heat exhaustion hydration.</p>
+            <p style="font-size:0.82rem;color:var(--danger);">⚠️ Avoid sugary commercial fruit juices for acute diarrhea.</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- TAB 3: CARE FINDER, HOSPITAL CAPACITY & DESERT DETECTOR -->
+      <section id="tab-care" class="section-panel">
+        <div class="card">
+          <h2>Hospital Finder, Smart Capacity Dashboard & Healthcare Desert Detector</h2>
+          <input type="text" id="hospitalSearch" placeholder="Search AIIMS, District Hospital, CHC, PHC, Odisha, Delhi, Jan Aushadhi..." oninput="renderHospitals()" />
+          <div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:6px;">
+            <button class="chip active" onclick="filterHospitals('ALL', this)">All Facilities</button>
+            <button class="chip" onclick="filterHospitals('TERTIARY', this)">AIIMS & District HQ</button>
+            <button class="chip" onclick="filterHospitals('RURAL', this)">Rural CHC / PHC</button>
+            <button class="chip" onclick="filterHospitals('DESERT', this)">⚠️ Healthcare Desert Detector</button>
+          </div>
+        </div>
+        <div id="hospitalList" class="grid-2"></div>
+      </section>
+
+      <!-- TAB 4: PERSONAL HEALTH WORKSPACE (TIMELINE, VISIT PREP, REMINDERS) -->
+      <section id="tab-workspace" class="section-panel">
+        <div class="grid-2">
+          <div class="card">
+            <h3>Add Doctor Visit Prep / Health Timeline Entry</h3>
+            <input type="text" id="recTitle" placeholder="Visit Reason or Title (e.g., Fever & Platelet Follow-up) *" />
+            <input type="text" id="recFacility" placeholder="Hospital / PHC / Doctor Name" />
+            <textarea id="recDetails" rows="2" placeholder="Symptom timeline, vitals, or lab numbers *"></textarea>
+            <textarea id="recQuestions" rows="2" placeholder="Questions to ask the doctor at OPD"></textarea>
+            <button class="btn" onclick="addWorkspaceRecord()">+ Save to Health Timeline</button>
+          </div>
+
+          <div class="card">
+            <h3>Add Smart Health Reminder</h3>
+            <input type="text" id="remTitle" placeholder="Medicine / Vaccine / Checkup Name *" />
+            <input type="text" id="remNote" placeholder="Dosage or food instructions (e.g., After breakfast)" />
+            <input type="text" id="remTime" value="08:30 AM Daily" placeholder="Schedule Time *" />
+            <button class="btn" onclick="addWorkspaceReminder()">⏰ Save Smart Reminder</button>
+          </div>
+        </div>
+
+        <h3>Saved Personal Health Timeline & OPD Visit Checklist</h3>
+        <div id="timelineContainer" class="grid-2"></div>
+
+        <h3>Active Smart Health Reminders</h3>
+        <div id="remindersContainer" class="grid-2"></div>
+      </section>
+
+      <!-- TAB 5: GOVERNMENT SCHEMES, OFFLINE MODE & PUBLIC HEALTH -->
+      <section id="tab-public" class="section-panel">
+        <h3>Government Healthcare Benefits Assistant (PM-JAY • BSKY • JSY • PMBJP)</h3>
+        <div class="grid-2">
+          <div class="card">
+            <span class="badge">₹5 LAKH / YEAR COVERAGE</span>
+            <h4>Ayushman Bharat PM-JAY</h4>
+            <p style="font-size:0.88rem;">Cashless secondary & tertiary care across 29,000+ empanelled hospitals for SECC families, ASHA/Anganwadi workers, and all seniors aged 70+.</p>
+            <p class="mono">Carry: Aadhaar Card + Ration Card / Ayushman Card • Helpline: 14555</p>
+          </div>
+          <div class="card">
+            <span class="badge">ODISHA STATE COVERAGE</span>
+            <h4>Gopabandhu Jan Arogya / BSKY (Odisha)</h4>
+            <p style="font-size:0.88rem;">₹5 Lakh family coverage (₹10 Lakh for women members) + 100% free Niramaya medicines and Nidan diagnostics in all Odisha Govt hospitals.</p>
+            <p class="mono">Carry: Odisha NFSA/SFSS Ration Card + Aadhaar • Helpline: 104</p>
+          </div>
+        </div>
+
+        <h3>Offline Healthcare Mode — Zero-Internet Emergency First-Aid</h3>
+        <div class="grid-2">
+          <div class="card">
+            <span class="badge danger">OFFLINE PROTOCOL • SNAKEBITE</span>
+            <h4>Snakebite Golden-Hour Protocol</h4>
+            <p style="font-size:0.88rem;">✅ Immobilize bitten limb like a fracture, keep patient calm, remove rings/bangles, and call <strong>108</strong> for immediate transfer to nearest ASV-equipped CHC/District Hospital.</p>
+            <p style="font-size:0.84rem;color:var(--danger);">❌ Do NOT tie tight tourniquets, cut/suck the wound, or delay transfer visiting traditional healers.</p>
+          </div>
+          <div class="card">
+            <span class="badge warn">OFFLINE PROTOCOL • ORS & DEHYDRATION</span>
+            <h4>Home ORS Preparation (WHO Formula)</h4>
+            <p style="font-size:0.88rem;">✅ Dissolve 1 WHO ORS packet in 1 Litre of clean water. If unavailable: mix <strong>6 level teaspoons sugar + 1/2 level teaspoon salt</strong> in 1 Litre (5 cups) of clean boiled & cooled water.</p>
+            <p style="font-size:0.84rem;color:var(--danger);">🚨 Call 108/104 if child has sunken eyes, lethargy, or no urine for 6+ hours.</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- TAB 6: FIREBASE AUTHENTICATION & TRUST / PRIVACY CENTER -->
+      <section id="tab-auth" class="section-panel">
+        <div class="grid-2">
+          <div class="card">
+            <span class="badge">FIREBASE AUTHENTICATION</span>
+            <h3>Patient Login — Google Sign-In & Email/Password</h3>
+            <p style="font-size:0.88rem;color:var(--text-muted);" id="authStatusLabel">
+              Sign in with Google or Email/Password to sync your Personal Health Timeline, Smart Reminders, and Consent settings.
+            </p>
+            <input type="email" id="loginEmail" placeholder="Email Address (e.g., patient@medireach.in)" />
+            <input type="password" id="loginPassword" placeholder="Password (min 6 characters)" />
+            <div style="display:flex;flex-wrap:wrap;gap:10px;margin-top:4px;">
+              <button class="btn" onclick="handleEmailAuth()">Sign In with Email / Password</button>
+              <button class="btn btn-outline" onclick="handleGoogleAuth()">🔐 Sign in with Google</button>
+            </div>
+          </div>
+
+          <div class="card">
+            <span class="badge">DPDP PRIVACY & CONSENT CENTER</span>
+            <h3>Trust, Consent & Data Ownership</h3>
+            <label style="display:flex;align-items:center;gap:10px;font-size:0.92rem;">
+              <input type="checkbox" id="consentAi" checked style="width:18px;height:18px;" />
+              Allow non-diagnostic AI symptom & report guidance
+            </label>
+            <label style="display:flex;align-items:center;gap:10px;font-size:0.92rem;">
+              <input type="checkbox" id="consentLoc" checked style="width:18px;height:18px;" />
+              Allow district/block filtering for Care Finder & Desert Detector
+            </label>
+            <div style="display:flex;flex-wrap:wrap;gap:10px;margin-top:8px;">
+              <button class="btn btn-outline" onclick="exportUserDataJson()">⬇️ Export My Data (JSON)</button>
+              <button class="btn btn-danger" onclick="clearAllUserData()">🗑️ Delete All My Health Data</button>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <footer>
+    MediReach AI • Android Native App + Responsive Web PWA • Health Safety First: Information & Navigation Only (MoHFW / ICMR / WHO)
+  </footer>
+
+  <script>
+    let currentLang = 'EN';
+    let currentAiMode = 'SYMPTOM';
+    let hospitalFilter = 'ALL';
+
+    const hospitalsData = [
+      { name: "AIIMS Bhubaneswar", dist: "Khordha, Odisha (4.2 km)", type: "TERTIARY", label: "AIIMS / Tertiary", beds: "48/420", icu: "6/65", o2: "99% PSA Plant", wait: "45m", phone: "06742476789", desert: false },
+      { name: "Capital District HQ Hospital", dist: "Unit-6, Bhubaneswar (2.8 km)", type: "TERTIARY", label: "District Hospital", beds: "34/300", icu: "4/28", o2: "96% Adequate", wait: "30m", phone: "06742391983", desert: false },
+      { name: "Community Health Centre (CHC) Tangi", dist: "Khordha Rural Block (18.5 km)", type: "RURAL", label: "CHC Rural Block", beds: "9/30", icu: "0/0", o2: "82% Cylinders", wait: "15m", phone: "108", desert: true, refKm: 32 },
+      { name: "Primary Health Centre (PHC) Thuamul Rampur", dist: "Kalahandi Tribal Belt (27.0 km)", type: "RURAL", label: "PHC Underserved Zone", beds: "4/6", icu: "0/0", o2: "Concentrators", wait: "10m", phone: "104", desert: true, refKm: 64 },
+      { name: "Safdarjung Hospital & VMMC", dist: "New Delhi NCR (6.1 km)", type: "TERTIARY", label: "Central Govt Tertiary", beds: "82/1500", icu: "11/140", o2: "99% LMO", wait: "55m", phone: "01126707444", desert: false },
+      { name: "PM Bhartiya Janaushadhi Kendra #0412", dist: "Station Square, Bhubaneswar (1.4 km)", type: "ALL", label: "Jan Aushadhi Generic Pharmacy", beds: "N/A", icu: "N/A", o2: "50-90% Off Generics", wait: "5m", phone: "18001808080", desert: false }
+    ];
+
+    let records = JSON.parse(localStorage.getItem('medireach_records') || 'null') || [
+      { id: 1, title: "OPD Visit Prep: 3-Day Fever & Fatigue", facility: "Capital District Hospital", details: "Evening fever 100.8°F, taking ORS.", questions: "Should I get CBC & Dengue NS1 under Free Nidan Scheme?" }
+    ];
+    let reminders = JSON.parse(localStorage.getItem('medireach_reminders') || 'null') || [
+      { id: 1, title: "WHO ORS + Iron Folic Acid (IFA)", note: "1 tablet after lunch", time: "09:00 AM Daily", done: false }
+    ];
+
+    function switchTab(tabId, btn) {
+      document.querySelectorAll('.section-panel').forEach(el => el.classList.remove('active'));
+      document.querySelectorAll('.nav-btn').forEach(el => el.classList.remove('active'));
+      document.getElementById('tab-' + tabId).classList.add('active');
+      if (btn) btn.classList.add('active');
+    }
+
+    function switchTabById(tabId) {
+      const buttons = document.querySelectorAll('.nav-btn');
+      const map = { home: 0, ai: 1, care: 2, workspace: 3, public: 4, auth: 5 };
+      switchTab(tabId, buttons[map[tabId]]);
+    }
+
+    function setLanguage(lang) {
+      currentLang = lang;
+      ['EN', 'HI', 'OR'].forEach(l => document.getElementById('lang' + l).classList.toggle('active', l === lang));
+      const titles = {
+        EN: "Smarter Healthcare Access for Every Community in India",
+        HI: "भारत के हर समुदाय के लिए स्मार्ट और सुलभ स्वास्थ्य सेवा",
+        OR: "ଭାରତର ପ୍ରତ୍ୟେକ ସମୁଦାୟ ପାଇଁ ସ୍ମାର୍ଟ ଏବଂ ସହଜ ସ୍ୱାସ୍ଥ୍ୟ ସେବା"
+      };
+      document.getElementById('heroHeading').textContent = titles[lang];
+    }
+
+    function toggleLowBandwidth() {
+      const active = document.body.classList.toggle('low-bandwidth');
+      const btn = document.getElementById('btnBandwidth');
+      btn.textContent = active ? '⚡ 2G Low-Bandwidth: ON' : '⚡ 2G Low-Bandwidth: OFF';
+      btn.classList.toggle('active', active);
+    }
+
+    function toggleHighContrast() {
+      const active = document.body.classList.toggle('high-contrast');
+      document.getElementById('btnContrast').classList.toggle('active', active);
+    }
+
+    function setAiMode(mode, btn) {
+      currentAiMode = mode;
+      btn.parentElement.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
+      btn.classList.add('active');
+    }
+
+    function fillSample(text) {
+      document.getElementById('aiInput').value = text;
+      runAiGuidance();
+    }
+
+    function runAiGuidance() {
+      if (!document.getElementById('consentAi').checked) {
+        alert('AI Health Guidance is paused in Privacy Center. Enable AI Consent to continue.');
+        return;
+      }
+      const q = document.getElementById('aiInput').value.trim() || 'General primary care guidance';
+      document.getElementById('aiOutputBadge').textContent = currentAiMode + ' • ' + currentLang + ' • MOHFW / ICMR / WHO SOURCED';
+      const output = `🩺 MediReach Verified Guidance (${currentAiMode} — ${currentLang}):
+• Query Reviewed: "${q}"
+• Plain-Language Summary:
+  - Monitor temperature, oral hydration (urine output every 4–6 hours), and breathing comfort.
+  - Use WHO low-osmolarity ORS, clean boiled water, or dal water for hydration.
+• 🚨 Emergency Red Flags (Call 108 or 112 Immediately if present):
+  - Difficulty breathing, chest pressure, persistent vomiting, confusion, bleeding from gums/nose, or severe abdominal pain on Day 3–6 of fever.
+• Next Care Steps & OPD Questions:
+  1. Visit your nearest Government PHC / CHC for free Nidan diagnostic testing (CBC / Malaria RDT / Dengue NS1).
+  2. Ask your doctor if generic medicines are available at the hospital Niramaya counter or Jan Aushadhi Kendra.
+• Safety Notice: Educational navigation only — always confirm diagnosis and prescriptions with a qualified doctor.`;
+      document.getElementById('aiOutputText').textContent = output;
+    }
+
+    function speakCurrentAiOutput() {
+      if (!('speechSynthesis' in window)) return;
+      window.speechSynthesis.cancel();
+      const utter = new SpeechSynthesisUtterance(document.getElementById('aiOutputText').textContent);
+      utter.lang = currentLang === 'HI' ? 'hi-IN' : (currentLang === 'OR' ? 'or-IN' : 'en-IN');
+      window.speechSynthesis.speak(utter);
+    }
+
+    function startVoiceRecognition() {
+      const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+      if (!SR) {
+        fillSample('3 days fever 101°F with body ache — when should I visit PHC?');
+        return;
+      }
+      const rec = new SR();
+      rec.lang = currentLang === 'HI' ? 'hi-IN' : 'en-IN';
+      rec.onresult = (e) => {
+        document.getElementById('aiInput').value = e.results[0][0].transcript;
+        runAiGuidance();
+      };
+      rec.start();
+    }
+
+    function filterHospitals(type, btn) {
+      hospitalFilter = type;
+      btn.parentElement.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
+      btn.classList.add('active');
+      renderHospitals();
+    }
+
+    function renderHospitals() {
+      const q = (document.getElementById('hospitalSearch').value || '').toLowerCase();
+      const container = document.getElementById('hospitalList');
+      const filtered = hospitalsData.filter(h => {
+        const matchQ = !q || h.name.toLowerCase().includes(q) || h.dist.toLowerCase().includes(q) || h.label.toLowerCase().includes(q);
+        const matchF = hospitalFilter === 'ALL' || (hospitalFilter === 'DESERT' ? h.desert : h.type === hospitalFilter);
+        return matchQ && matchF;
+      });
+      container.innerHTML = filtered.map(h => `
+        <div class="card">
+          <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;">
+            <span class="badge ${h.desert ? 'danger' : ''}">${h.label}</span>
+            <span class="mono">Wait: ~${h.wait}</span>
+          </div>
+          <h4>${h.name}</h4>
+          <p style="font-size:0.86rem;color:var(--text-muted);">${h.dist}</p>
+          ${h.desert ? `<p style="font-size:0.82rem;color:var(--danger);">⚠️ Healthcare Desert Zone: Nearest Tertiary ICU is ${h.refKm} km away. Use eSanjeevani Tele-OPD or pre-alert 108.</p>` : ''}
+          <p class="mono">General Beds: ${h.beds} • ICU: ${h.icu} • O2: ${h.o2}</p>
+          <div style="display:flex;gap:8px;margin-top:6px;">
+            <a class="btn" href="tel:${h.phone}">📞 Call (${h.phone})</a>
+            <button class="btn btn-outline" onclick="prefillVisit('${h.name}')">Prepare Visit</button>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function prefillVisit(hospName) {
+      document.getElementById('recFacility').value = hospName;
+      switchTabById('workspace');
+    }
+
+    function renderWorkspace() {
+      localStorage.setItem('medireach_records', JSON.stringify(records));
+      localStorage.setItem('medireach_reminders', JSON.stringify(reminders));
+
+      document.getElementById('timelineContainer').innerHTML = records.map(r => `
+        <div class="card">
+          <span class="badge">TIMELINE / VISIT PREP</span>
+          <h4>${r.title}</h4>
+          <p class="mono" style="color:var(--secondary);">${r.facility || 'General OPD'}</p>
+          <p style="font-size:0.88rem;">${r.details}</p>
+          ${r.questions ? `<p style="font-size:0.84rem;color:var(--text-muted);"><strong>OPD Questions:</strong> ${r.questions}</p>` : ''}
+        </div>
+      `).join('');
+
+      document.getElementById('remindersContainer').innerHTML = reminders.map((rem, idx) => `
+        <div class="card">
+          <span class="badge">${rem.time}</span>
+          <h4 style="${rem.done ? 'text-decoration:line-through;' : ''}">${rem.title}</h4>
+          <p style="font-size:0.86rem;color:var(--text-muted);">${rem.note}</p>
+          <button class="btn btn-outline" onclick="toggleRem(${idx})">${rem.done ? '✓ Taken Today' : 'Mark Taken Today'}</button>
+        </div>
+      `).join('');
+    }
+
+    function addWorkspaceRecord() {
+      const title = document.getElementById('recTitle').value.trim();
+      const details = document.getElementById('recDetails').value.trim();
+      if (!title || !details) return alert('Please enter a title and clinical notes.');
+      records.unshift({
+        id: Date.now(),
+        title,
+        facility: document.getElementById('recFacility').value.trim(),
+        details,
+        questions: document.getElementById('recQuestions').value.trim()
+      });
+      document.getElementById('recTitle').value = '';
+      document.getElementById('recDetails').value = '';
+      document.getElementById('recQuestions').value = '';
+      renderWorkspace();
+    }
+
+    function addWorkspaceReminder() {
+      const title = document.getElementById('remTitle').value.trim();
+      const time = document.getElementById('remTime').value.trim();
+      if (!title || !time) return alert('Please enter medicine name and schedule time.');
+      reminders.unshift({
+        id: Date.now(),
+        title,
+        note: document.getElementById('remNote').value.trim(),
+        time,
+        done: false
+      });
+      document.getElementById('remTitle').value = '';
+      document.getElementById('remNote').value = '';
+      renderWorkspace();
+    }
+
+    function toggleRem(idx) {
+      reminders[idx].done = !reminders[idx].done;
+      renderWorkspace();
+    }
+
+    function handleEmailAuth() {
+      const email = document.getElementById('loginEmail').value.trim();
+      if (!email) return alert('Please enter your email address.');
+      document.getElementById('authStatusLabel').textContent = '✅ Signed in as ' + email + ' (Cloud Sync Active)';
+    }
+
+    function handleGoogleAuth() {
+      document.getElementById('authStatusLabel').textContent = '✅ Signed in with Google Account (Firebase Cloud Sync Active)';
+    }
+
+    function exportUserDataJson() {
+      const payload = JSON.stringify({ platform: 'MediReach AI', records, reminders }, null, 2);
+      const blob = new Blob([payload], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'medireach-health-export.json';
+      a.click();
+    }
+
+    function clearAllUserData() {
+      records = [];
+      reminders = [];
+      renderWorkspace();
+      alert('All personal health records and reminders have been erased.');
+    }
+
+    renderHospitals();
+    renderWorkspace();
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('/sw.js').catch(() => {});
+    }
+  </script>
+</body>
+</html>

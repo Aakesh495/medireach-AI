@@ -1,0 +1,201 @@
+{
+  "entities": {
+    "HealthRecord": {
+      "title": "HealthRecord",
+      "description": "Personal health timeline entry, symptom log, lab note, or doctor visit preparation workspace item.",
+      "type": "object",
+      "properties": {
+        "userId": {
+          "type": "string",
+          "description": "Authenticated owner UID matching request.auth.uid."
+        },
+        "title": {
+          "type": "string",
+          "description": "Short title of the health record or doctor visit topic (1-150 chars)."
+        },
+        "category": {
+          "type": "string",
+          "enum": ["TIMELINE", "VISIT_PREP", "LAB_NOTE", "SYMPTOM_LOG"],
+          "description": "Category of the record."
+        },
+        "details": {
+          "type": "string",
+          "description": "Detailed notes, symptom history, or report summary (1-2000 chars)."
+        },
+        "facilityOrDoctor": {
+          "type": "string",
+          "description": "Hospital, clinic, PHCs, or doctor name (0-150 chars)."
+        },
+        "questionsForDoctor": {
+          "type": "string",
+          "description": "Prepared questions to ask the clinician during visit (0-1000 chars)."
+        },
+        "severityOrPriority": {
+          "type": "string",
+          "enum": ["LOW", "MODERATE", "HIGH", "ROUTINE"],
+          "description": "Priority or triage urgency tag."
+        },
+        "completed": {
+          "type": "boolean",
+          "description": "Whether the doctor visit or follow-up action is completed."
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Server timestamp when created (FieldValue.serverTimestamp())."
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Server timestamp when last updated (FieldValue.serverTimestamp())."
+        }
+      },
+      "required": [
+        "userId",
+        "title",
+        "category",
+        "details",
+        "facilityOrDoctor",
+        "questionsForDoctor",
+        "severityOrPriority",
+        "completed",
+        "createdAt",
+        "updatedAt"
+      ]
+    },
+    "HealthReminder": {
+      "title": "HealthReminder",
+      "description": "Smart health reminder for medicines, vaccinations, appointments, or routine checkups.",
+      "type": "object",
+      "properties": {
+        "userId": {
+          "type": "string",
+          "description": "Authenticated owner UID matching request.auth.uid."
+        },
+        "title": {
+          "type": "string",
+          "description": "Medicine or checkup reminder name (1-150 chars)."
+        },
+        "dosageOrNote": {
+          "type": "string",
+          "description": "Dosage instructions, food timing, or clinic instructions (0-300 chars)."
+        },
+        "scheduleTime": {
+          "type": "string",
+          "description": "Human-readable schedule time, e.g., 08:00 AM Daily (1-60 chars)."
+        },
+        "reminderType": {
+          "type": "string",
+          "enum": ["MEDICINE", "APPOINTMENT", "VACCINE", "CHECKUP"],
+          "description": "Type of health reminder."
+        },
+        "isActive": {
+          "type": "boolean",
+          "description": "Whether the reminder notifications are enabled."
+        },
+        "takenToday": {
+          "type": "boolean",
+          "description": "Whether the dose or action was completed today."
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Server timestamp when created (FieldValue.serverTimestamp())."
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Server timestamp when last updated (FieldValue.serverTimestamp())."
+        }
+      },
+      "required": [
+        "userId",
+        "title",
+        "dosageOrNote",
+        "scheduleTime",
+        "reminderType",
+        "isActive",
+        "takenToday",
+        "createdAt",
+        "updatedAt"
+      ]
+    },
+    "PrivacyConsent": {
+      "title": "PrivacyConsent",
+      "description": "User consent, privacy, accessibility, low-bandwidth, and multilingual settings.",
+      "type": "object",
+      "properties": {
+        "userId": {
+          "type": "string",
+          "description": "Authenticated owner UID matching request.auth.uid."
+        },
+        "aiGuidanceConsent": {
+          "type": "boolean",
+          "description": "Explicit user consent for non-diagnostic AI health information."
+        },
+        "emergencyLocationConsent": {
+          "type": "boolean",
+          "description": "Consent to use coarse/fine location for nearby hospital and desert detection."
+        },
+        "anonymousPublicHealthAnalytics": {
+          "type": "boolean",
+          "description": "Opt-in for anonymized regional health trend insights."
+        },
+        "lowBandwidthMode": {
+          "type": "boolean",
+          "description": "Enables compact low-data UI and offline-first caching."
+        },
+        "highContrastMode": {
+          "type": "boolean",
+          "description": "Enables enhanced contrast and large readable typography."
+        },
+        "preferredLanguage": {
+          "type": "string",
+          "enum": ["EN", "HI", "OR"],
+          "description": "Preferred interface and AI response language (English, Hindi, Odia)."
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Server timestamp when created (FieldValue.serverTimestamp())."
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Server timestamp when last updated (FieldValue.serverTimestamp())."
+        }
+      },
+      "required": [
+        "userId",
+        "aiGuidanceConsent",
+        "emergencyLocationConsent",
+        "anonymousPublicHealthAnalytics",
+        "lowBandwidthMode",
+        "highContrastMode",
+        "preferredLanguage",
+        "createdAt",
+        "updatedAt"
+      ]
+    }
+  },
+  "firestore": {
+    "/users/{userId}/health_records/{recordId}": {
+      "schema": {
+        "$ref": "#/entities/HealthRecord"
+      },
+      "description": "Per-user health timeline entries and doctor visit preparation items."
+    },
+    "/users/{userId}/reminders/{reminderId}": {
+      "schema": {
+        "$ref": "#/entities/HealthReminder"
+      },
+      "description": "Per-user smart medicine, vaccination, and appointment reminders."
+    },
+    "/users/{userId}/privacy_settings/{settingId}": {
+      "schema": {
+        "$ref": "#/entities/PrivacyConsent"
+      },
+      "description": "Per-user trust, consent, accessibility, low-bandwidth, and language preferences."
+    }
+  }
+}

@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+    <!-- Outer soft shield halo -->
+    <path
+        android:fillColor="#264FD1C5"
+        android:pathData="M54,22 L80,32 L80,54 C80,71 69,83 54,88 C39,83 28,71 28,54 L28,32 Z" />
+    <!-- Crisp white medical shield -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M54,26 L76,35 L76,53 C76,68 66.5,78.5 54,83.5 C41.5,78.5 32,68 32,53 L32,35 Z" />
+    <!-- Coral-warm healthcare cross inside shield -->
+    <path
+        android:fillColor="#0D6E6E"
+        android:pathData="M50,39 H58 V49 H68 V57 H58 V67 H50 V57 H40 V49 H50 Z" />
+    <!-- Subtle warm gold accent dot representing AI intelligence -->
+    <path
+        android:fillColor="#F59E0B"
+        android:pathData="M54,50 A3,3 0 1,1 54,56 A3,3 0 1,1 54,50 Z" />
+</vector>

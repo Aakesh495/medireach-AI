@@ -1,0 +1,173 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Global default-deny safety net
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // Hardened Global Helpers
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isValidId(id) {
+      return id is string && id.size() >= 1 && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
+    }
+
+    function incoming() {
+      return request.resource.data;
+    }
+
+    function existing() {
+      return resource.data;
+    }
+
+    // Validation Helper: HealthRecord
+    function isValidHealthRecord(data) {
+      return data.userId is string && data.userId == request.auth.uid && data.userId.size() >= 1 && data.userId.size() <= 128 &&
+             data.title is string && data.title.size() >= 1 && data.title.size() <= 150 &&
+             data.category is string && (data.category == 'TIMELINE' || data.category == 'VISIT_PREP' || data.category == 'LAB_NOTE' || data.category == 'SYMPTOM_LOG') &&
+             data.details is string && data.details.size() >= 1 && data.details.size() <= 2000 &&
+             data.facilityOrDoctor is string && data.facilityOrDoctor.size() <= 150 &&
+             data.questionsForDoctor is string && data.questionsForDoctor.size() <= 1000 &&
+             data.severityOrPriority is string && (data.severityOrPriority == 'LOW' || data.severityOrPriority == 'MODERATE' || data.severityOrPriority == 'HIGH' || data.severityOrPriority == 'ROUTINE') &&
+             data.completed is bool &&
+             data.createdAt is timestamp && data.createdAt <= request.time &&
+             data.updatedAt is timestamp && data.updatedAt <= request.time;
+    }
+
+    // Validation Helper: HealthReminder
+    function isValidHealthReminder(data) {
+      return data.userId is string && data.userId == request.auth.uid && data.userId.size() >= 1 && data.userId.size() <= 128 &&
+             data.title is string && data.title.size() >= 1 && data.title.size() <= 150 &&
+             data.dosageOrNote is string && data.dosageOrNote.size() <= 300 &&
+             data.scheduleTime is string && data.scheduleTime.size() >= 1 && data.scheduleTime.size() <= 60 &&
+             data.reminderType is string && (data.reminderType == 'MEDICINE' || data.reminderType == 'APPOINTMENT' || data.reminderType == 'VACCINE' || data.reminderType == 'CHECKUP') &&
+             data.isActive is bool &&
+             data.takenToday is bool &&
+             data.createdAt is timestamp && data.createdAt <= request.time &&
+             data.updatedAt is timestamp && data.updatedAt <= request.time;
+    }
+
+    // Validation Helper: PrivacyConsent
+    function isValidPrivacyConsent(data) {
+      return data.userId is string && data.userId == request.auth.uid && data.userId.size() >= 1 && data.userId.size() <= 128 &&
+             data.aiGuidanceConsent is bool &&
+             data.emergencyLocationConsent is bool &&
+             data.anonymousPublicHealthAnalytics is bool &&
+             data.lowBandwidthMode is bool &&
+             data.highContrastMode is bool &&
+             data.preferredLanguage is string && (data.preferredLanguage == 'EN' || data.preferredLanguage == 'HI' || data.preferredLanguage == 'OR') &&
+             data.createdAt is timestamp && data.createdAt <= request.time &&
+             data.updatedAt is timestamp && data.updatedAt <= request.time;
+    }
+
+    match /users/{userId} {
+      // 1. Personal Health Timeline & Doctor Visit Preparation Workspace
+      match /health_records/{recordId} {
+        allow get: if isSignedIn() && request.auth.uid == userId && isValidId(userId) && isValidId(recordId) && existing().userId == request.auth.uid;
+        allow list: if isSignedIn() && request.auth.uid == userId && existing().userId == request.auth.uid;
+
+        allow create: if isSignedIn() &&
+                         request.auth.uid == userId &&
+                         isValidId(userId) &&
+                         isValidId(recordId) &&
+                         incoming().keys().hasAll([
+                           'userId', 'title', 'category', 'details', 'facilityOrDoctor',
+                           'questionsForDoctor', 'severityOrPriority', 'completed', 'createdAt', 'updatedAt'
+                         ]) &&
+                         incoming().keys().hasOnly([
+                           'userId', 'title', 'category', 'details', 'facilityOrDoctor',
+                           'questionsForDoctor', 'severityOrPriority', 'completed', 'createdAt', 'updatedAt'
+                         ]) &&
+                         isValidHealthRecord(incoming());
+
+        allow update: if isSignedIn() &&
+                         isValidHealthRecord(incoming()) &&
+                         request.auth.uid == userId &&
+                         isValidId(userId) &&
+                         isValidId(recordId) &&
+                         incoming().userId == existing().userId &&
+                         incoming().createdAt == existing().createdAt &&
+                         incoming().diff(existing()).affectedKeys().hasOnly([
+                           'title', 'category', 'details', 'facilityOrDoctor',
+                           'questionsForDoctor', 'severityOrPriority', 'completed', 'updatedAt'
+                         ]);
+
+        allow delete: if isSignedIn() && request.auth.uid == userId && isValidId(userId) && isValidId(recordId) && existing().userId == request.auth.uid;
+      }
+
+      // 2. Smart Health Reminders
+      match /reminders/{reminderId} {
+        allow get: if isSignedIn() && request.auth.uid == userId && isValidId(userId) && isValidId(reminderId) && existing().userId == request.auth.uid;
+        allow list: if isSignedIn() && request.auth.uid == userId && existing().userId == request.auth.uid;
+
+        allow create: if isSignedIn() &&
+                         request.auth.uid == userId &&
+                         isValidId(userId) &&
+                         isValidId(reminderId) &&
+                         incoming().keys().hasAll([
+                           'userId', 'title', 'dosageOrNote', 'scheduleTime',
+                           'reminderType', 'isActive', 'takenToday', 'createdAt', 'updatedAt'
+                         ]) &&
+                         incoming().keys().hasOnly([
+                           'userId', 'title', 'dosageOrNote', 'scheduleTime',
+                           'reminderType', 'isActive', 'takenToday', 'createdAt', 'updatedAt'
+                         ]) &&
+                         isValidHealthReminder(incoming());
+
+        allow update: if isSignedIn() &&
+                         isValidHealthReminder(incoming()) &&
+                         request.auth.uid == userId &&
+                         isValidId(userId) &&
+                         isValidId(reminderId) &&
+                         incoming().userId == existing().userId &&
+                         incoming().createdAt == existing().createdAt &&
+                         incoming().diff(existing()).affectedKeys().hasOnly([
+                           'title', 'dosageOrNote', 'scheduleTime',
+                           'reminderType', 'isActive', 'takenToday', 'updatedAt'
+                         ]);
+
+        allow delete: if isSignedIn() && request.auth.uid == userId && isValidId(userId) && isValidId(reminderId) && existing().userId == request.auth.uid;
+      }
+
+      // 3. Trust & Privacy Center Consent Settings
+      match /privacy_settings/{settingId} {
+        allow get: if isSignedIn() && request.auth.uid == userId && isValidId(userId) && isValidId(settingId) && existing().userId == request.auth.uid;
+        allow list: if isSignedIn() && request.auth.uid == userId && existing().userId == request.auth.uid;
+
+        allow create: if isSignedIn() &&
+                         request.auth.uid == userId &&
+                         isValidId(userId) &&
+                         isValidId(settingId) &&
+                         incoming().keys().hasAll([
+                           'userId', 'aiGuidanceConsent', 'emergencyLocationConsent',
+                           'anonymousPublicHealthAnalytics', 'lowBandwidthMode',
+                           'highContrastMode', 'preferredLanguage', 'createdAt', 'updatedAt'
+                         ]) &&
+                         incoming().keys().hasOnly([
+                           'userId', 'aiGuidanceConsent', 'emergencyLocationConsent',
+                           'anonymousPublicHealthAnalytics', 'lowBandwidthMode',
+                           'highContrastMode', 'preferredLanguage', 'createdAt', 'updatedAt'
+                         ]) &&
+                         isValidPrivacyConsent(incoming());
+
+        allow update: if isSignedIn() &&
+                         isValidPrivacyConsent(incoming()) &&
+                         request.auth.uid == userId &&
+                         isValidId(userId) &&
+                         isValidId(settingId) &&
+                         incoming().userId == existing().userId &&
+                         incoming().createdAt == existing().createdAt &&
+                         incoming().diff(existing()).affectedKeys().hasOnly([
+                           'aiGuidanceConsent', 'emergencyLocationConsent',
+                           'anonymousPublicHealthAnalytics', 'lowBandwidthMode',
+                           'highContrastMode', 'preferredLanguage', 'updatedAt'
+                         ]);
+
+        allow delete: if isSignedIn() && request.auth.uid == userId && isValidId(userId) && isValidId(settingId) && existing().userId == request.auth.uid;
+      }
+    }
+  }
+}
